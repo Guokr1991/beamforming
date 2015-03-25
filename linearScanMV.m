@@ -51,6 +51,7 @@ e = ones(Mp,1);                  % steering vector for pre-steered data
 % initialize matrices
 Yl = zeros(M,nZ,length(nz0));
 rf_mv = zeros(length(nz0),M,n_tx);
+n_tx = 1;
 % covG = zeros(Mp,nZ,M-Mp); 
 
 for l = 1:n_tx 
@@ -59,18 +60,36 @@ for l = 1:n_tx
     for z0_i = 1:length(nz0)
         z0_win = nz0(z0_i)-nZ/2+1:nz0(z0_i)+nZ/2;
         Yl(:,:,z0_i) = fft(rf_bf(z0_win,:,l),[],1)';
-        for p = 1:M-Mp+1
-            G = Yl(p:p+Mp-1,:,z0_i);
-            covG(:,:,p) = G*G';
+        
+        for k = 1:nZ
+            Rl = zeros(Mp,Mp);
+            Gav = zeros(Mp,1);
+            for p = 1:M-Mp+1
+                G = Yl(p:p+Mp-1,k,z0_i);
+                Rl = G*G'+Rl;
+                Gav = G+Gav;
+            end
+%             Rl = 1/Mp*Rl;
+            Gav = 1/Mp*Gav;
+            wl = inv(Rl)*e/(e'*inv(Rl)*e);
+            Bl(k,z0_i) = wl'*Gav; % beamform in frequency domain
         end
-        Rl(:,:,z0_i) = sum(covG,3);
-        tmp = repmat(real(inv(Rl(:,:,z0_i))*e/(e'*inv(Rl(:,:,z0_i))*e))',M/Mp,1);
-        Wl(z0_i,:) = tmp(:);
-        wl = 
-        rf_mv(z0_i,:,l) = rf_bf(nz0(z0_i),:,l).* wl(z0_i,:); 
+        bl(:,z0_i) = ifft(Bl(:,z0_i)); % extract beamformed rf segment
+        rf_out(z0_i,l) = bl(nZ/2);
     end
-    rf_out(:,l) = sum(rf_mv(:,:,l),2);
 end
+        
+%         for p = 1:M-Mp+1
+%             G = Yl(p:p+Mp-1,:,z0_i);
+%             covG(:,:,p) = G*G';
+%         end
+%         Rl(:,:,z0_i) = sum(covG,3);
+%         tmp = repmat(real(inv(Rl(:,:,z0_i))*e/(e'*inv(Rl(:,:,z0_i))*e))',M/Mp,1);
+%         Wl(z0_i,:) = tmp(:);
+%         rf_mv(z0_i,:,l) = rf_bf(nz0(z0_i),:,l).* wl(z0_i,:); 
+%     end
+%     rf_out(:,l) = sum(rf_mv(:,:,l),2);
+% end
 
 %         Y{z0_i,l} = fft(rf_bf(z0_win,:,l),[],1); % fft at each rcv elem 
 % 

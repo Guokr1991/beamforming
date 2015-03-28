@@ -58,7 +58,7 @@ for j = 1:n_tx % iterate for every tx event
     rf_out(:,j) = sum(w_mat.*linearInterp(z_ref'/acq_params.c,squeeze(rf_in(:,:,j)),t_samp),2);
 end
 
-rf_out = filter(b,a,rf_out);
 rf_out(find(isnan(rf_out))) = 0; 
+rf_out = filter(b,a,rf_out);
 toc
 

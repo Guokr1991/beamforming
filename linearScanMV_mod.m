@@ -1,5 +1,5 @@
-function [rf_out, x, z] = linearScanMVtest(rf_in,acq_params,bf_params)
-% [rf_out, x, z] = linearScanMVtest(rf,acq_params,bf_params)
+function [rf_out, x, z] = linearScanMV_mod(rf_in,acq_params,bf_params,lines,flag)
+% [rf_out, x, z] = linearScanMV_mod(rf,acq_params,bf_params)
 %
 % Dynamic receive code - Will Long. Latest revision: 10/1/14
 % Inputs: 
@@ -12,32 +12,33 @@ function [rf_out, x, z] = linearScanMVtest(rf_in,acq_params,bf_params)
 % each tx location (i.e. image using 128 subaperture of 256 array with tx
 % focus at center of subaperture. Walk subaperture to generate multiple
 % scan lines. In this case, lateral distance from focus is only the rx pos.
-
-
-%all focusing performed on axis
-
+% 
+% all focusing performed on axis
+%
 % acq_params.rx_pos; %lateral positions of each rx element relative to tx
 % bf_params.x; %lateral positions of each tx focus (per tx event)
 % acq_params.c;
 % acq_params.t0; start time of rf data reference in terms of sample number
 
-x = bf_params.x;
+if nargin < 4 || isempty(lines)
+    lines = 1:length(bf_params.x);
+end
+if nargin < 5
+    flag = 0;
+end
+
+x = bf_params.x(lines);
 z_ref = ((acq_params.t0+1:acq_params.t0+size(rf_in,1))/acq_params.fs)*acq_params.c;
 z = z_ref/2;
 
 [b,a]=butter(2,[.05 .95]);
 
 % intialize matrices and arrays for speed
-n_tx = length(bf_params.x);         % # of transmit events
+n_tx = length(x);         % # of transmit events
 M = length(acq_params.rx_pos);      % # of receive channels per transmit
 n_depth = length(z);
 % rf_out = zeros(length(z),n_tx);
 
-
-if M ~= size(rf_in,2) || n_tx ~= size(rf_in,3)
-    disp('Mismatch in RF data.')
-end
-    
 dz = repmat(z',1,M);
 dx = repmat(acq_params.rx_pos,n_depth,1);
 dr = sqrt(dz.^2+dx.^2);
@@ -49,16 +50,26 @@ Mp = floor(M/4);                % # of subarray elements for subarray avg (Mp <=
 fprintf('# elements in subarray: %d \n',Mp)
 e = ones(Mp,1);                  % steering vector for pre-beamformed data
 
+rf_bf = zeros(length(z),M,length(lines));
+switch flag
+    case 0 
+        idx = 0;
+        fprintf('Dynamic receive focusing... /n');
+        for l = lines
+            idx = idx+1;
+            rf_bf(:,:,idx) = linearInterp(z_ref'/acq_params.c,squeeze(rf_in(:,:,l)),t_samp);
+        end
+    case 1
+        rf_bf = rf_in;
+end
+
 idx = 0;
-for l = 1:n_tx
-    fprintf('%d/%d A-line processed... \n',l,n_tx)
+for l = lines
+    fprintf('%d/%d A-line processed... \n',l,length(bf_params.x))
     idx = idx+1;
     rf_bf(find(isnan(rf_bf))) = 0; 
     Yl = fft(rf_bf(:,:,idx),nZ,1)';
         
-%     rf_bf(:,:,idx) = linearInterp(z_ref'/acq_params.c,squeeze(rf_in(:,:,l)),t_samp);
-    rf_bf(:,:,idx) = rf_in(:,:,idx);
-    
     for k = 1:nZ
         Rl = zeros(Mp,Mp);
         Gav = zeros(Mp,1);

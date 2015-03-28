@@ -37,8 +37,10 @@ tdr_info = xdc_get(tx,'rect');
 full_arr_x = unique(tdr_info(24,:));
 rx_pos = full_arr_x((128-63):(128+64));
 
-z = 0.02:0.01:0.06;
-position = [zeros(length(z),1) zeros(length(z),1) z'];
+% z = 0.02:0.01:0.06;
+z = [z_focus-0.005];
+xpos = (el_width+el_kerf)/2;
+position = [xpos' zeros(length(z),1) z'];
 amplitude = ones(length(z),1);
 
 figure
@@ -80,4 +82,4 @@ acq_params.rx_pos = rx_pos;
 
 bf_params.x = x;
 
-save('simdata_multi.mat','acq_params','bf_params','rf')
+save('simdata_multi_lat_centered.mat','acq_params','bf_params','rf')

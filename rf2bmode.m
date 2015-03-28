@@ -1,19 +1,23 @@
-function [env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, x, z, x_range, z_range)
+function [env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, db, x, z, x_range, z_range);
 %[env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, x, z)
 
-if nargin == 1
+if nargin == 1 || isempty(db)
+    db = 40;
+    disp('40 dB scale.')
+end
+if nargin <= 2
     x_range = [1 size(rf_out,2)];
     z_range = [1 size(rf_out,1)];
     x = 1:size(rf_out,2);
     z = 1:size(rf_out,1);
-elseif nargin == 3
+elseif nargin == 4
     x_range = [min(x) max(x)];
     z_range = [min(z) max(z)];
     disp('Use full data.')
-elseif nargin == 4
+elseif nargin == 5
     z_range = [min(z) max(z)];
     disp('Use full depth data.')
-elseif nargin ==5
+elseif nargin == 6
     if isempty(x_range)
         x_range = [min(x) max(x)];
     end
@@ -33,8 +37,8 @@ rf_win = rf_out(z_idx, x_idx);
 env=abs(hilbert(rf_win));
 env_win=20*log10(env/max(env(:)));
 
-if nargin == 1
-    imagesc(env_win); colormap('gray');
+if nargin <= 2
+    imagesc(env_win,[-db 0]); colormap('gray');
 else
-    imagesc(x_win, z_win, env_win, [-40 0]); colormap('gray'); axis image;
+    imagesc(x_win, z_win, env_win, [-db 0]); colormap('gray'); axis image;
 end

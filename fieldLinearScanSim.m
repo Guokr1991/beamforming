@@ -71,6 +71,8 @@ for nn = 1:nr
     
 end
 [rf, t0] = shift_times_multi(rf,st,fs);
+SNR = 60;
+rf = rf+10^(-SNR/20)*max(rf(:))*randn(size(rf));
 xdc_free(rx); xdc_free(tx);
 
 field_end
@@ -82,4 +84,4 @@ acq_params.rx_pos = rx_pos;
 
 bf_params.x = x;
 
-save('simdata_multi_lat_centered.mat','acq_params','bf_params','rf')
+save('simdata_pt.mat','acq_params','bf_params','rf')

@@ -1,19 +1,17 @@
-function [rf_out, x, z] = linearScanMV_mod2(rf_in,acq_params,bf_params,lines,flag)
+function [rf_out, x, z] = linearScanMV(rf_in,acq_params,bf_params,lines,flag)
 % [rf_out, x, z] = linearScanMV_mod2(rf,acq_params,bf_params,64,1)
 %
-% Dynamic receive code - Will Long. Latest revision: 10/1/14
+% Linear scan beamforming code - Will Long. Latest revision: 4/2/15
 % Inputs: 
 % rf_in - raw rf data organized [rf_line,rx_chan, tx_event]
 % acq_params - parameters include rx_pos, c, t0
 % bf_params - parameters include x (tx_pos or A line lateral location)
-% flag - '1' for beamformed rf input and '0' raw rf input
+% flag - '1' for pre-steered rf input and '0' raw rf input
 % 
 % NOTE: for the case when all rx positions are relative and identical for
 % each tx location (i.e. image using 128 subaperture of 256 array with tx
 % focus at center of subaperture. Walk subaperture to generate multiple
 % scan lines. In this case, lateral distance from focus is only the rx pos.
-% 
-% all focusing performed on axis
 %
 % acq_params.rx_pos; %lateral positions of each rx element relative to tx
 % bf_params.x; %lateral positions of each tx focus (per tx event)
@@ -39,18 +37,19 @@ dx = repmat(acq_params.rx_pos,n_depth,1);
 dr = sqrt(dz.^2+dx.^2);
 t_samp = (dr+dz)./acq_params.c;
 
+nZ = 128; % fft window size (should be larger than 2 way conv of pulse)
+if nZ > length(z)
+    error('Specified fft window size greater than available data'); 
+end
+nz0 = nZ/2:length(z)-nZ/2; % depths to window and beamform
 
-nZ = 128; 
-if nZ > length(z),error('Specified fft window size greater than available data'); end
-% # of data points per frequency window (segments without overlap)
-% nz0 = 1:nZ:floor(n_depth/nZ)*nZ;
-nz0 = nZ/2:length(z)-nZ/2;
-
-Mp = floor(M/4);                % # of subarray elements for subarray avg (Mp <= M/2)
+Mp = floor(M/4); % # of subarray elements for subarray avg (Mp <= M/2)
+e = ones(Mp,1); % steering vector for pre-beamformed data (all ones for
+    % planar wavefront)
 fprintf('# elements for subarray avg: %d \n',Mp)
-e = ones(Mp,1);                  % steering vector for pre-beamformed data
 
 rf_bf = zeros(length(z),M,length(lines));
+% perform pre-steering DR if needed
 switch flag
     case 0 
         idx = 0;
@@ -70,6 +69,7 @@ rf_bf(isnan(rf_bf)) = 0;
 Bl = zeros(1,nZ);
 rf_out = zeros(length(nz0),length(lines));
 
+% minimum variance beamform at each depth and for each freq band
 idx = 0;
 for l = lines
     fprintf('Beamforming %d/%d A-line... \n',l,length(bf_params.x))
@@ -77,11 +77,9 @@ for l = lines
     idx = idx+1;
     
     for zi = 1:length(nz0)
-%         zwin = nz0(zi):nz0(zi)+nZ-1;
-%         Yl = fft(rf_bf(zwin,:,idx),nZ,1)';
-        zwin = nz0(zi)-nZ/2+1:nz0(zi)+nZ/2;
+        % overlapping boxcar windows at each individual depth for fft
+        zwin = nz0(zi)-nZ/2+1:nz0(zi)+nZ/2; 
         Yl = fft(rf_bf(zwin,:,l),[],1).';
-        
         for k = 1:nZ
             Rl = zeros(Mp,Mp);
             Gav = zeros(Mp,1);
@@ -96,18 +94,15 @@ for l = lines
             wl = (Rl\e)/(e'*(Rl\e));
             Bl(k) = wl'*Gav;                % beamform operation in k-domain
         end
-%         rf_out(zwin,idx) = ifft(Bl,nZ);             % inverse fft to retreive beamformed rf
-        
-        bl = ifft(Bl); % extract beamformed rf segment
+        % inverse fft to extract beamformed rf
+        bl = ifft(Bl);
         rf_out(zi,idx) = bl(floor(nZ/2));
     end
     toc
 end
 
 z = z(nz0);
-% 
 % [b,a]=butter(2,[.05 .95]);
 % rf_out = filter(b,a,rf_out);
-rf_out = flipud(rf_out);
 
 

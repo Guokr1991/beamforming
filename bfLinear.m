@@ -1,1 +1,0 @@
-function bfLinear(rf_in)

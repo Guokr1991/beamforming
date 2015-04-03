@@ -37,6 +37,7 @@ for j = 1:n_tx
     end
     if tot_sample(j) ~= max_sample
         tmp_rf = [tmp_rf; zeros(max_sample - tot_sample(j), n_rcv)];
+
     end
     pad_rf(:,:,j) = tmp_rf;
     clear tmp_rf

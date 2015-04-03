@@ -1,7 +1,7 @@
 function [rf_out, x, z] = linearScanMV(rf_in,acq_params,bf_params,lines,flag)
-% [rf_out, x, z] = linearScanMV_mod2(rf,acq_params,bf_params,64,1)
+% [rf_out, x, z] = linearScanMV(rf,acq_params,bf_params,[],0);
 %
-% Linear scan beamforming code - Will Long. Latest revision: 4/2/15
+% Linear scan MV beamforming code - Will Long. Latest revision: 4/2/15
 % Inputs: 
 % rf_in - raw rf data organized [rf_line,rx_chan, tx_event]
 % acq_params - parameters include rx_pos, c, t0

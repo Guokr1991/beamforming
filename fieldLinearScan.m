@@ -45,9 +45,11 @@ xdc_excitation(tx,excitation);
 tshift=size(conv(conv(excitation,imp_resp),imp_resp),2)/2;
 
 % z = 0.02:0.01:0.06;
-% zpos = [35:10:45 30:5:60 42.5:2.5:47.5];
-% xpos = [-5*ones(1,3) zeros(1,6)  5*ones(1,3)];
+% zpos = [35:10:45 30:5:60 42.5:2.5:47.5]./1000;
+% xpos = [-5*ones(1,3) zeros(1,6)  5*ones(1,3)]./1000;
 
+zpos = zpos./1000;
+xpos = xpos./1000;
 position = [xpos' zeros(length(zpos),1) zpos'];
 amplitude = ones(length(zpos),1);
 
@@ -61,7 +63,7 @@ rx_pos = unique(tdr_info(24,:));
 
 for nn = 1:lines
     xpos_shift = xpos+x(nn);
-    position = [xpos_shift zeros(length(zpos),1) zpos];
+    position = [xpos_shift' zeros(length(zpos),1) zpos'];
     fprintf('Generating A-line %d/%d at %.1f mm \n',nn,lines,...
         1000*xpos_shift);
     xdc_times_focus(rx,0,zeros(1,N_el));

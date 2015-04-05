@@ -50,13 +50,19 @@ tshift=size(conv(conv(excitation,imp_resp),imp_resp),2)/2;
 
 zpos = zpos./1000;
 xpos = xpos./1000;
-position = [xpos' zeros(length(zpos),1) zpos'];
-amplitude = ones(length(zpos),1);
 
 sector=sec/1000;
 zfoc=focus(3);
 lines=8*ceil(sector/(lambda*zfoc/ap_size))+1; % scan lines odd to ensure 
 x=linspace(-sector/2,sector/2,lines);
+
+% alter x positions so that points are directly on a-line
+for n = 1:length(xpos)
+    [~,ax_i] = min(abs(x-xpos(n)));
+    xpos(n) = x(ax_i);
+end
+
+amplitude = ones(length(zpos),1);
 
 tdr_info = xdc_get(rx,'rect');
 rx_pos = unique(tdr_info(24,:));
@@ -64,8 +70,8 @@ rx_pos = unique(tdr_info(24,:));
 for nn = 1:lines
     xpos_shift = xpos+x(nn);
     position = [xpos_shift' zeros(length(zpos),1) zpos'];
-    fprintf('Generating A-line %d/%d at %.1f mm \n',nn,lines,...
-        1000*xpos_shift);
+%     fprintf('Generating A-line %d/%d at %.1f mm \n',nn,lines,...
+%         1000*xpos_shift);
     xdc_times_focus(rx,0,zeros(1,N_el));
     [tmp st(nn)] = calc_scat_multi(tx,rx,position,amplitude);
     rf_tmp{nn} = tmp;

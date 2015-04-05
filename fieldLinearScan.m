@@ -62,6 +62,7 @@ for n = 1:length(xpos)
     xpos(n) = x(ax_i);
 end
 
+xpos*1000
 amplitude = ones(length(zpos),1);
 
 tdr_info = xdc_get(rx,'rect');

@@ -1,6 +1,7 @@
-function [rf, rf_raw, bf_params, acq_params] = fieldLinearScan(xpos,zpos,sec)
+function [rf, rf_raw, bf_params, acq_params] = fieldLinearScan(pointx,pointz,sec)
 addpath('../field_ii')
 field_init(-1)
+rng(0);
 
 % Transducer parameters
 f0=7e6;
@@ -44,33 +45,47 @@ xdc_excitation(tx,excitation);
 
 tshift=size(conv(conv(excitation,imp_resp),imp_resp),2)/2;
 
-% z = 0.02:0.01:0.06;
-% zpos = [35:10:45 30:5:60 42.5:2.5:47.5]./1000;
-% xpos = [-5*ones(1,3) zeros(1,6)  5*ones(1,3)]./1000;
-
-zpos = zpos./1000;
-xpos = xpos./1000;
-
 sector=sec/1000;
 zfoc=focus(3);
 lines=8*ceil(sector/(lambda*zfoc/ap_size))+1; % scan lines odd to ensure 
 x=linspace(-sector/2,sector/2,lines);
 
-% alter x positions so that points are directly on a-line
-for n = 1:length(xpos)
-    [~,ax_i] = min(abs(x-xpos(n)));
-    xpos(n) = x(ax_i);
-end
+if isempty(pointx) || isempty(pointz)
+    lat_res = lambda*zfoc/ap_size;
+    ax_res = lambda;
+    aResCell = lat_res*ax_res;
+    xposlim = [-10 10]./1000;
+    zposlim = [30 50]./1000;
 
-xpos*1000
-amplitude = ones(length(zpos),1);
+    scatPerResCell = 5; % minimum for ~ fully developed speckle
+
+    scatDensity = scatPerResCell/aResCell;
+    scatN = round((diff(xposlim)*diff(zposlim))*scatDensity);
+
+    xpos = xposlim(1)+(xposlim(2)-xposlim(1)).*rand(scatN,1);
+    zpos = zposlim(1)+(zposlim(2)-zposlim(1)).*rand(scatN,1);
+
+    amplitude = ones(scatN,1);
+    k = find((xpos.^2+(zpos-0.04).^2)<0.005^2);
+    amplitude(k) = 0;
+else
+    zpos = pointz'./1000;
+    xpos = pointx'./1000;
+    % alter x positions so that points are directly on a-line
+    for n = 1:length(xpos)
+        [~,ax_i] = min(abs(x-xpos(n)));
+        xpos(n) = x(ax_i);
+    end
+    xpos*1000
+    amplitude = ones(length(zpos),1);
+end
 
 tdr_info = xdc_get(rx,'rect');
 rx_pos = unique(tdr_info(24,:));
 
 for nn = 1:lines
     xpos_shift = xpos+x(nn);
-    position = [xpos_shift' zeros(length(zpos),1) zpos'];
+    position = [xpos_shift zeros(length(zpos),1) zpos];
 %     fprintf('Generating A-line %d/%d at %.1f mm \n',nn,lines,...
 %         1000*xpos_shift);
     xdc_times_focus(rx,0,zeros(1,N_el));

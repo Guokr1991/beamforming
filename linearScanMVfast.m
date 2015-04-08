@@ -1,4 +1,4 @@
-function [rf_out, x, z] = linearScanMVfast(rf_in,acq_params,bf_params,lines,flag)
+function [rf_out, x, z, rf_steer] = linearScanMVfast(rf_in,acq_params,bf_params,lines,flag)
 % [rf_out, x, z] = linearScanMVfast(rf,acq_params,bf_params,[],0);
 %
 % Linear scan MV beamforming code - Will Long. Latest revision: 4/2/15
@@ -38,20 +38,20 @@ dr = sqrt(dz.^2+dx.^2);
 t_samp = (dr+dz)./acq_params.c;
 
 % perform pre-steering (DR delay)
-rf_bf = zeros(length(z),M,length(lines));
+rf_steer = zeros(length(z),M,length(lines));
 switch flag
     case 0 
         idx = 0;
         fprintf('Performing pre-steering... \n');
         for l = lines
             idx = idx+1;
-            rf_bf(:,:,idx) = linearInterp(z_ref'/acq_params.c,squeeze(rf_in(:,:,l)),t_samp);
+            rf_steer(:,:,idx) = linearInterp(z_ref'/acq_params.c,squeeze(rf_in(:,:,l)),t_samp);
         end
     case 1
         fprintf('Pre-steering skipped. \n');
-        rf_bf = rf_in;
+        rf_steer = rf_in;
 end
-rf_bf(isnan(rf_bf)) = 0;
+rf_steer(isnan(rf_steer)) = 0;
 
 % initiate MV beamformer parameters
 
@@ -81,9 +81,9 @@ for l = lines
     idx = idx+1;
 
     % pre-calculate fft for speed
-    Yl_mat = zeros(Nwin,length(iz0),size(rf_bf,2));
-    for rcv = 1:size(rf_bf,2)
-        tmp = rf_bf(izwin(:),rcv,l);
+    Yl_mat = zeros(Nwin,length(iz0),size(rf_steer,2));
+    for rcv = 1:size(rf_steer,2)
+        tmp = rf_steer(izwin(:),rcv,l);
         % define matrix of windowed rf data in columns for a single rcv
         % line
         rcv_mat = reshape(tmp,size(izwin)); 
@@ -118,40 +118,3 @@ for l = lines
     toc
 end
 z = z(iz0);
-
-%     for zi = 1:length(nz0)
-%         % overlapping boxcar windows at each individual depth for fft
-%         zwin = nz0(zi)-nZ/2+1:nz0(zi)+nZ/2; 
-%         
-%         
-%     end
-%     
-%     
-%     
-%     
-%         Yl = fft(rf_bf(zwin,:,l),[],1).';
-%         for k = 1:nZ
-%             Rl = zeros(Mp,Mp);
-%             Gav = zeros(Mp,1);
-%             for p = 1:M-Mp+1
-%                 G = Yl(p:p+Mp-1,k);
-%                 Rl = G*G'+Rl;
-%                 Gav = G+Gav;
-%             end
-%             Rl = 1/Mp*Rl;
-%             Gav = 1/Mp*Gav;
-% %             wl = inv(Rl)*e/(e'*inv(Rl)*e);
-%             wl = (Rl\e)/(e'*(Rl\e));
-%             Bl(k) = wl'*Gav;                % beamform operation in k-domain
-%         end
-%         % inverse fft to extract beamformed rf
-%         bl = ifft(Bl);
-%         rf_out(zi,idx) = bl(floor(nZ/2));
-%     end
-%     toc
-% end
-% 
-% z = z(nz0);
-% 
-% 
-% 

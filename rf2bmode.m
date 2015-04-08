@@ -1,4 +1,4 @@
-function [env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, db, x, z, x_range, z_range);
+function [env, rf_win, x_win, z_win] = rf2bmode(rf_out, db, x, z, x_range, z_range);
 %[env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, x, z)
 
 if nargin == 1 || isempty(db)
@@ -39,6 +39,8 @@ env_win=20*log10(env/max(env(:)));
 
 if nargin <= 2
     imagesc(env_win,[-db 0]); colormap('gray');
+    xlabel('index'),ylabel('index')
 else
-    imagesc(x_win, z_win, env_win, [-db 0]); colormap('gray'); axis image;
+    imagesc(1000*x_win, 1000*z_win, env_win, [-db 0]); colormap('gray'); axis image;
+    xlabel('Lateral Distance [mm]'),ylabel('Axial Distance [mm]')
 end

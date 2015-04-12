@@ -39,7 +39,7 @@ title('Steered Channel Data')
 %% lesion comparison figures
 clear all; close all;
 
-DR = 60;
+DR = 50;
 zlims = [30 50]./1000;
 
 load les_DR.mat
@@ -78,7 +78,7 @@ xlabel('Lateral Distance [mm]'); ylabel('Power [dB]')
 %% PSF figures
 clear all; close all
 
-DR = 60;
+DR = 50;
 xlims = [-4 4]./1000;
 
 load point_target_MV128fft.mat
@@ -122,7 +122,7 @@ hold off
 
 clear all; close all;
 
-DR = 60;
+DR = 50;
 xlims = [];
 % [-4 4]./1000;
 % zlims = [30 50]./1000;
@@ -173,7 +173,7 @@ end
  
 clear all; close all;
 
-DR = 60;
+DR = 50;
 xlims = [];
 fig = 9;
 
@@ -212,3 +212,28 @@ figure(fig)
 subplot(235)
 [env,~,x,z] = rf2bmode(rf_out,DR,x,z,xlims,zlims);
 
+%% horizontal and vertical point grid 
+clear all; close all;
+
+DR = 50;
+xlims = [];
+fig = 10;
+
+load(['point_grid_MV128fft.mat'])
+zlims = [min(z) max(z)];
+figure(fig)
+subplot(133)
+[env,~,x,z] = rf2bmode(rf_out,DR,x,z,xlims,zlims);
+title('Minimum Variance')
+
+load(['point_grid_DR.mat'])
+figure(fig)
+subplot(131)
+[env,~,x,z] = rf2bmode(rf_out,DR,x,z,xlims,zlims);
+title('DS (Boxcar)')
+
+load(['point_grid_DRhann.mat'])
+figure(fig)
+subplot(132)
+[env,~,x,z] = rf2bmode(rf_out,DR,x,z,xlims,zlims);
+title('DS (Hanning)')

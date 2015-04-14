@@ -55,7 +55,8 @@ rf_steer(isnan(rf_steer)) = 0;
 
 % initiate MV beamformer parameters
 
-Mp = floor(M/4); % # of subarray elements for subarray avg (Mp <= M/2)
+Mp = 32;
+% floor(M/4); % # of subarray elements for subarray avg (Mp <= M/2)
 e = ones(Mp,1); % steering vector (all ones for planar wavefront)
 fprintf('# elements for subarray avg: %d \n',Mp)
 

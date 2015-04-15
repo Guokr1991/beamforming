@@ -1,5 +1,5 @@
-function [rf_out, x, z, rf_steer] = linearScanMVfast(rf_in,acq_params,bf_params,lines,flag)
-% [rf_out, x, z] = linearScanMVfast(rf,acq_params,bf_params,[],0);
+function [rf_out, x, z, rf_steer] = linearScanMVfast(rf_in,acq_params,bf_params,lines,flag,Mp)
+% [rf_out, x, z] = linearScanMVfast(rf,acq_params,bf_params,[],0,32);
 %
 % Linear scan MV beamforming code - Will Long. Latest revision: 4/2/15
 % Inputs: 
@@ -24,12 +24,16 @@ end
 if nargin < 5
     flag = 0;
 end
+if nargin < 6 || isempty(Mp)
+    % M = length(acq_params.rx_pos);      % # of receive channels per transmit
+    M = size(rf_in,2); % # of a lines to beamform
+    Mp = floor(M/4); % # of subarray elements for subarray avg (Mp <= M/2)
+end
+    
 
 x = bf_params.x(lines);
 z_ref = ((acq_params.t0+1:acq_params.t0+size(rf_in,1))/acq_params.fs)*acq_params.c;
 z = z_ref/2;
-
-M = length(acq_params.rx_pos);      % # of receive channels per transmit
 n_depth = length(z);
 
 dz = repmat(z',1,M);
@@ -54,9 +58,6 @@ end
 rf_steer(isnan(rf_steer)) = 0;
 
 % initiate MV beamformer parameters
-
-Mp = 32;
-% floor(M/4); % # of subarray elements for subarray avg (Mp <= M/2)
 e = ones(Mp,1); % steering vector (all ones for planar wavefront)
 fprintf('# elements for subarray avg: %d \n',Mp)
 

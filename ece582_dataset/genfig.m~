@@ -283,6 +283,26 @@ xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
 title('Conventional')
 
+%% SSA MV side-by-side comparison (phantom target)
+clear all; close all; 
+
+fig = 12;
+DR = 50;
+
+figure(fig)
+load SSA_fetal_MV128fft_Mp25.mat
+xmv = x;
+zmv = z;
+subplot(121)
+rf2bmode(rf_out,DR,xmv,zmv);
+title('Mp = 25')
+
+load SSA_fetal_MV128fft_Mp10.mat
+xmv = x;
+zmv = z;
+subplot(122)
+rf2bmode(rf_out,DR,xmv,zmv);
+title('Mp = 10')
 
 
 

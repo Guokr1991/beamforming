@@ -1,34 +1,32 @@
-function [env, rf_win, x_win, z_win] = rf2bmode(rf_out, db, x, z, x_range, z_range);
+function [env, rf_win, x_win, z_win] = rf2bmode(rf_out, dbrange, x, z, xlims, zlims, flag);
 %[env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, x, z)
-
-if nargin == 1 || isempty(db)
-    db = 40;
-    disp('40 dB scale.')
+xlab = [];
+ylab = [];
+if nargin < 2 || isempty(dbrange)
+    dbrange = 40;
 end
-if nargin <= 2
-    x_range = [1 size(rf_out,2)];
-    z_range = [1 size(rf_out,1)];
+if nargin < 3 || isempty(x)
+    xlims = [1 size(rf_out,2)];
     x = 1:size(rf_out,2);
-    z = 1:size(rf_out,1);
-elseif nargin == 4
-    x_range = [min(x) max(x)];
-    z_range = [min(z) max(z)];
-    disp('Use full data.')
-elseif nargin == 5
-    z_range = [min(z) max(z)];
-    disp('Use full depth data.')
-elseif nargin == 6
-    if isempty(x_range)
-        x_range = [min(x) max(x)];
-    end
-    if isempty(z_range)
-        z_range = [min(z) max(z)];
-    end
-else
-    
+    xlab = 'jth index';
 end
-z_idx = find(z >= z_range(1) & z <= z_range(2));
-x_idx = find(x >= x_range(1) & x <= x_range(2));
+if nargin < 4 || isempty(z)
+    zlims = [1 size(rf_out,1)];
+    z = 1:size(rf_out,1);
+    ylab = 'ith index';
+end
+if nargin < 5 || isempty(xlims)
+    xlims = [min(x) max(x)];
+end
+if nargin < 6 || isempty(zlims)
+    zlims = [min(z) max(z)];
+end
+if nargin < 7 || isempty(flag)
+    flag = 1;
+end
+
+z_idx = find(z >= zlims(1) & z <= zlims(2));
+x_idx = find(x >= xlims(1) & x <= xlims(2));
 
 z_win = z(z_idx);
 x_win = x(x_idx);
@@ -37,10 +35,12 @@ rf_win = rf_out(z_idx, x_idx);
 env=abs(hilbert(rf_win));
 env_win=20*log10(env/max(env(:)));
 
-if nargin <= 2
-    imagesc(env_win,[-db 0]); colormap('gray');
-    xlabel('index'),ylabel('index')
-else
-    imagesc(1000*x_win, 1000*z_win, env_win, [-db 0]); colormap('gray'); axis image;
-    xlabel('Lateral Distance [mm]'),ylabel('Axial Distance [mm]')
+switch flag
+    case 0
+    case 1
+        imagesc(1000*x_win, 1000*z_win, env_win, [-dbrange 0]); colormap('gray'); 
+        xlabel(xlab), ylabel(ylab)
+        if isempty(ylab),ylabel('Axial Distance [mm]'); end
+        if isempty(xlab),xlabel('Lateral Distance [mm]'); end
+        if isempty(xlab) && isempty(ylab), axis image; end
 end

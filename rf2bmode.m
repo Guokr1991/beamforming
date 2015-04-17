@@ -34,13 +34,17 @@ x_win = x(x_idx);
 rf_win = rf_out(z_idx, x_idx);
 env=abs(hilbert(rf_win));
 env_win=20*log10(env/max(env(:)));
+xtic = x_win;
+ytic = z_win;
 
 switch flag
     case 0
     case 1
-        imagesc(1000*x_win, 1000*z_win, env_win, [-dbrange 0]); colormap('gray'); 
-        xlabel(xlab), ylabel(ylab)
-        if isempty(ylab),ylabel('Axial Distance [mm]'); end
-        if isempty(xlab),xlabel('Lateral Distance [mm]'); end
-        if isempty(xlab) && isempty(ylab), axis image; end
+        if isempty(xlab) && isempty(ylab), atype = 'image'; 
+        else, atype = 'square'; end
+        if isempty(ylab),ylab = 'Axial Distance [mm]'; ytic = 1000*z_win; end
+        if isempty(xlab),xlab = 'Lateral Distance [mm]'; xtic = 1000*x_win; end
+        imagesc(xtic, ytic, env_win, [-dbrange 0]); colormap('gray'); 
+        xlabel(xlab), ylabel(ylab), axis(atype);
+        
 end

@@ -487,16 +487,16 @@ env =rf2bmode(rf_cont, [], x, z, [], [], 0);
 zi = find(z*1000>=depth,1);
 xi = find(x*1000>=latlims(1) & x*1000<=latlims(2));
 tmp = env(zi,xi);
-plot(x(xi),20.*log10(tmp./max(tmp(:))),'k:');
+plot(1000*x(xi),20.*log10(tmp./max(tmp(:))),'k:');
 
 load SSA_points_MV128fft_Mp25.mat
 env = rf2bmode(rf_out, [], x, z, [], [], 0);
 zi = find(z*1000>=depth,1);
 xi = find(x*1000>=latlims(1) & x*1000<=latlims(2));
 tmp = env(zi,xi);
-plot(x(xi),20.*log10(tmp./max(tmp(:))),'k-');
+plot(1000*x(xi),20.*log10(tmp./max(tmp(:))),'k-');
 ax = gca;
-ax.XTick = [0.03:0.005:0.05];
+ax.XTick = [30:5:50];
 axis square
 hold off
 
@@ -516,14 +516,14 @@ clear all; close all
 % xlims = [8 16]./1e3;
 
 zlims = [76 84]./1e3;
-xlims = [36 46]./1e3;
+xlims = [36 45]./1e3;
 
 figure
 load SSA_points.mat
 rf_cont = squeeze(sum(rf,2));
 subplot(121)
 hold on
-[env,~,xwin, zwin] = rf2bmode(rf_cont, 50, x, z, xlims, zlims);
+[env,~,xwin, zwin] = rf2bmode(rf_cont, 40, x, z, xlims, zlims);
 envdb = 20.*log10(env./max(env(:)));
 contour(1e3.*xwin,1e3.*zwin,envdb,[-6 -6],'b'); axis image; 
 contour(1e3.*xwin,1e3.*zwin,envdb,[-12 -12],'r');
@@ -535,7 +535,7 @@ title('SSA')
 load SSA_points_MV128fft_Mp25.mat
 subplot(122)
 hold on
-[env,~,xwin, zwin] = rf2bmode(rf_out, 50, x, z, xlims, zlims);
+[env,~,xwin, zwin] = rf2bmode(rf_out, 40, x, z, xlims, zlims);
 envdb = 20.*log10(env./max(env(:)));
 contour(1e3.*xwin,1e3.*zwin,envdb,[-6 -6],'b'); axis image; 
 contour(1e3.*xwin,1e3.*zwin,envdb,[-12 -12],'r');
@@ -543,8 +543,10 @@ contour(1e3.*xwin,1e3.*zwin,envdb,[-20 -20],'g');
 set(gca,'YDir','reverse');
 hold off
 title('SSA + MV')
+set(gcf,'position',[100 100 700 300])
 %%
-pause
+figure(1)
+print ./fig/SSA_MVSSA_contour -deps
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% SSA FETAL PHANTOM FIGURES %%%%%
@@ -555,13 +557,13 @@ clear all; close all;
 
 DR = 45;
 
-figure
+figure(1)
 load SSA_fetal_MV128fft_Mp25.mat
 xmv = x;
 zmv = z;
 subplot(122)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV')
+title('SSA + MV'), grid off
 
 load SSA_fetal.mat
 rf_control = squeeze(sum(rf,2));
@@ -569,57 +571,62 @@ subplot(121)
 rf2bmode(rf_control,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA')
+title('SSA'), grid off
+set(gcf,'position',[100 100 700 300])
 
-figure
+figure(2)
 subplot(122)
 rf2bmode(rf_control,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA')
+title('SSA'), grid off
 
 load ./SSA_datasets/focusedSingle_fetal.mat
 subplot(121)
 rf2bmode(rf_focused,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
-title('Single Position SA')
+title('Single Position SA'), grid off
+set(gcf,'position',[100 100 700 300])
 
 %%
-pause
-%% SSA MV side-by-side comparison with Mp (phantom target)
-clear all; close all; 
-
-DR = 45;
-
-figure
-load SSA_fetal_MV128fft_Mp5.mat
-xmv = x;
-zmv = z;
-subplot(142)
-rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV (Mp = 5)')
-
-load SSA_fetal_MV128fft_Mp10.mat
-subplot(143)
-rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV (Mp = 10)')
-
-load SSA_fetal_MV128fft_Mp25.mat
-subplot(144)
-rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV (Mp = 25)')
-
-load SSA_fetal.mat
-rf_cont = squeeze(sum(rf,2));
-subplot(141)
-rf2bmode(rf_cont,DR,x,z);
-xlim(1000.*[min(xmv) max(xmv)]);
-ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA')
-
-%%
-pause
+figure(1)
+print ./fig/SSA_MVSSA_fetal -deps
+figure(2)
+print ./fig/SSA_SA_fetal -deps
+% %% SSA MV side-by-side comparison with Mp (phantom target)
+% clear all; close all; 
+% 
+% DR = 45;
+% 
+% figure
+% load SSA_fetal_MV128fft_Mp5.mat
+% xmv = x;
+% zmv = z;
+% subplot(142)
+% rf2bmode(rf_out,DR,xmv,zmv);
+% title('SSA + MV (Mp = 5)')
+% 
+% load SSA_fetal_MV128fft_Mp10.mat
+% subplot(143)
+% rf2bmode(rf_out,DR,xmv,zmv);
+% title('SSA + MV (Mp = 10)')
+% 
+% load SSA_fetal_MV128fft_Mp25.mat
+% subplot(144)
+% rf2bmode(rf_out,DR,xmv,zmv);
+% title('SSA + MV (Mp = 25)')
+% 
+% load SSA_fetal.mat
+% rf_cont = squeeze(sum(rf,2));
+% subplot(141)
+% rf2bmode(rf_cont,DR,x,z);
+% xlim(1000.*[min(xmv) max(xmv)]);
+% ylim(1000.*[min(zmv) max(zmv)]);
+% title('SSA')
+% 
+% %%
+% pause
 %% SSA MV phantom CNR calculations
 clear all; close all; clc
 
@@ -729,38 +736,42 @@ fprintf('CNR values: \nSSA: CNR = %.2f \nSSA + MV: %.2f \nSSA + MV + CF: %.2f \n
 
 fprintf('CR values: \nSSA: %.2f dB \nSSA + MV: %.2f dB \nSSA + MV + CF: %.2f dB \nGaussian: %.2f dB \nGaussian + CF: %.2f dB \n',...
     CR(1),CR(2),CR(3),CR(4),CR(5));
-%%
-pause
+
 %% SSA MV side-by-side comparison with Mp (phantom target)
 clear all; close all; 
 
 DR = 45;
 
-figure
+figure(1)
 load SSA_fetal_MV128fft_Mp5.mat
 xmv = x;
 zmv = z;
-subplot(142)
+subplot(222)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV (Mp = 5)')
+title('SSA + MV (Mp = 5)'), grid off
 
 load SSA_fetal_MV128fft_Mp10.mat
-subplot(143)
+subplot(223)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV (Mp = 10)')
+title('SSA + MV (Mp = 10)'), grid off
 
 load SSA_fetal_MV128fft_Mp25.mat
-subplot(144)
+subplot(224)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV (Mp = 25)')
+title('SSA + MV (Mp = 25)'), grid off
 
 load SSA_fetal.mat
 rf_cont = squeeze(sum(rf,2));
-subplot(141)
+subplot(221)
 rf2bmode(rf_cont,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA')
+title('SSA'), grid off
+
+set(gcf,'position',[100 100 600 600])
+%%
+figure(1)
+print ./fig/Mp_compare_fetal -deps
 %% Zoomed SSA MV side-by-side Mp comparison (phantom target)
 clear all; close all; 
 
@@ -801,26 +812,25 @@ xlim(xlims);
 ylim(ylims);
 title('SSA')
 
-%%
-pause
+
 %% SSA MV side-by-side comparison with CF (phantom target)
 clear all; close all
 
 DR = 45;
 CFDR = 70;
 
-figure
+figure(1)
 load SSA_fetal_MV128fft_Mp25.mat
 xmv = x;
 zmv = z;
 subplot(132)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV')
+title('SSA + MV'), grid off
 
 load SSA_fetal_MV128fft_Mp25_CF.mat
 subplot(133)
 rf2bmode(rf_cf,CFDR,xmv,zmv);
-title('SSA + MV + CF (-70 dB)')
+title('SSA + MV + CF [-70 dB]'), grid off
 
 load SSA_fetal.mat
 rf_cont = squeeze(sum(rf,2));
@@ -828,10 +838,12 @@ subplot(131)
 rf2bmode(rf_cont,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA')
+title('SSA'), grid off
 
+set(gcf,'position',[100 100 800 350])
 %%
-pause
+figure(1)
+print ./fig/CF_compare_fetal -deps
 %% SSA MV side-by-side comparison with CF (phantom target)
 clear all; close all
 

@@ -12,12 +12,12 @@ L = size(rf,2);
 
 switch type
     case 'gauss'
-        win = gausswin(L,param)'; 
+        win = gausswin(L,param); 
     case 'hann'
-
+        win = hann(L);
 end
 
-winmat = repmat(win,size(rf,1),1);
+winmat = repmat(win',size(rf,1),1);
 
 figure
 plot(win)

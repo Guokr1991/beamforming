@@ -84,7 +84,6 @@ title('DS (Hanning)')
 tmp = env(idx,:);
 figure(3)
 plot(1000*x,20.*log10(tmp/max(tmp)),'b'); axis square
-
 tmp = mask_les.*env;
 env_les = tmp(find(tmp ~= 0));
 tmp = mask_bg.*env;

@@ -1,4 +1,4 @@
-function [rf_out, rf_pre, x, z] = linearScanDR(rf_in,acq_params,bf_params,type)
+function [rf_out, rf_steer, x, z] = linearScanDR(rf_in,acq_params,bf_params,type)
 % [rf_out, ~, x, z] = linearScanDR(rf,acq_params,bf_params)
 %
 % Dynamic receive code - Will Long. Latest revision: 10/1/14
@@ -55,8 +55,8 @@ end
     
 w_mat = repmat(w,size(rf_in,1),1);
 for j = 1:n_tx % iterate for every tx event
-    rf_pre(:,:,j) = w_mat.*linearInterp(z_ref'/acq_params.c,squeeze(rf_in(:,:,j)),t_samp);
-    rf_out(:,j) = sum(rf_pre(:,:,j),2);
+    rf_steer(:,:,j) = w_mat.*linearInterp(z_ref'/acq_params.c,squeeze(rf_in(:,:,j)),t_samp);
+    rf_out(:,j) = sum(rf_steer(:,:,j),2);
 end
 
 rf_out(find(isnan(rf_out))) = 0; 

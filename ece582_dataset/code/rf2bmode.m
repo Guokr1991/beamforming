@@ -1,6 +1,7 @@
 function [env, rf_win, x_win, z_win] = rf2bmode(rf_out, dbrange, x, z, xlims, zlims, flag);
 %[env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, x, z)
 %
+% Envelope detect and show B-mode - Will Long. Latest revision: 4/2/15
 % rf_out - beamformer output of focused radiofrequency signal array
 % dbrange - dynamic range of output image in dB
 % x - lateral positions to envelope detect [m]

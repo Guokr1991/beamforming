@@ -1,7 +1,7 @@
 function [rf_out, x, z, rf_steer] = linearScanMVfast(rf_in,acq_params,bf_params,lines,flag,Mp)
 % [rf_out, x, z] = linearScanMVfast(rf,acq_params,bf_params,[],0,32);
 %
-% Linear Scan MV beamforming code - Will Long. Latest revision: 4/2/15
+% Linear Scan MV beamforming code - Will Long. Latest revision: 4/23/15
 % Inputs: 
 % rf_in - element array data [array signal x array element x Tx event]
 % acq_params - parameters include rx_pos, c, t0

@@ -32,14 +32,14 @@ rf_norm(701:size(rf,1),:) = tmp./max(tmp(:));
 
 figure(1)
 subplot(122)
-I2 = imagesc(el_n,t,rf_norm); colormap gray; axis square
-xlabel('Element no.'),ylim([min(t) 62]);
+I2 = imagesc(el_n,t-52,rf_norm); colormap gray; axis square
+xlabel('Element no.'),ylim([min(t-52) 62-52]);
 ylabel('t [\mus]')
 title('Steered Channel Data'), grid off
 set(gcf,'position',[100 100 700 300])
 %%
 figure(1)
-print ./fig/steering_diagram -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/steering_diagram -deps
 %% lesion comparison figures
 clear all; close all; clc
 
@@ -121,9 +121,9 @@ fprintf('CR values: \nMV: %.2f dB \nDS (Boxcar): %.2f dB \nDS (Hanning): %.2f dB
 
 %%
 figure(1)
-print ./fig/lesion_bmode -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/lesion_bmode -deps
 figure(2)
-print ./fig/lesion_power -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/lesion_power -deps
 %% lesion comparison figures with CF
 clear all; close all; clc
 
@@ -176,7 +176,7 @@ xlabel('Lateral Distance [mm]'); ylabel('Power [dB]')
 clear all; close all; clc
 
 DR = 50;
-xlims = [-4 4]./1000;
+xlims = [-5 5]./1000;
 ylims = [-120 0];
 factor = 20; % interpolation factor
 z0 = 45;
@@ -184,8 +184,10 @@ z0 = 45;
 load point_target_MV128fft.mat
 zlims = [min(z) 46.5/1000];
 figure(1)
-subplot(313)
+% subplot(313)
+subplot(3,2,5)
 [env,~,x,z] = rf2bmode(rf_out,DR,x,z,xlims,zlims);
+ylabel('Depth [mm]')
 title('MV'), grid off
 ax = gca;
 ax.YTick = [44.5:0.5:50];
@@ -198,13 +200,17 @@ x = interp(x,factor);
 fwhm(1) = 2*abs(x(find(tmpdb>=-6,1)))*1e3;
 lobes = sort(findpeaks(tmpdb),'descend')
 PSL(1) = lobes(find(lobes<-10,1));
-figure(2); hold all
+% figure(2); 
+subplot(3,2,[2 4 6]);
+hold all
 plot(1000*x,tmpdb,'k'); axis square; xlim(xlims.*1000); ylim(ylims);
 
 load point_target_DR.mat
-figure(1)
-subplot(311)
+% figure(1)
+% subplot(311)
+subplot(3,2,1)
 [env,~,x,z] = rf2bmode(rf_out,DR,x,z,xlims,zlims);
+ylabel('Depth [mm]')
 title('DS (Boxcar)'), grid off
 ax = gca;
 ax.YTick = [44.5:0.5:50];
@@ -217,17 +223,21 @@ x = interp(x,factor);
 fwhm(2) = 2*abs(x(find(tmpdb>=-6,1)))*1e3;
 lobes = sort(findpeaks(tmpdb),'descend');
 PSL(2) = lobes(find(lobes<-10,1));
-figure(2)
+% figure(2)
+subplot(3,2,[2 4 6])
 plot(1000*x,tmpdb,'k--'); axis square; xlim(xlims.*1000); ylim(ylims);
 
 load point_target_DRhann.mat
-figure(1)
-subplot(312)
+% figure(1)
+% subplot(312)
+subplot(3,2,3)
 [env,~,x,z] = rf2bmode(rf_out,DR,x,z,xlims,zlims);
+ylabel('Depth [mm]')
 title('DS (Hanning)'), grid off
 ax = gca;
 ax.YTick = [44.5:0.5:50];
-set(gcf,'position',[100 100 500 500])
+% set(gcf,'position',[100 100 500 500])
+set(gcf,'position',[100 100 800 350])
 
 idx = find(z>=z0/1000,1);
 tmp = env(idx,:);
@@ -237,7 +247,9 @@ x = interp(x,factor);
 fwhm(3) = 2*abs(x(find(tmpdb>=-6,1)))*1e3;
 lobes = sort(findpeaks(tmpdb),'descend');
 PSL(3) = lobes(find(lobes<-10,1));
-figure(2)
+
+% figure(2)
+subplot(3,2,[2 4 6])
 plot(1000*x,tmpdb,'k:'); axis square; xlim(xlims.*1000); ylim(ylims);
 h = legend('MV','DS (Boxcar)','DS (Hanning)','Location','southwest');
 set(h,'FontSize',12);
@@ -251,9 +263,12 @@ fprintf('MV: PSL = %d dB \nDS (Boxcar): PSL = %d dB \nDS (Hanning): PSL = %d dB 
     round(PSL(1)),round(PSL(2)),round(PSL(3)));
 %%
 figure(1)
-print ./fig/PSF_bmode -deps
-figure(2)
-print ./fig/PSF_beampattern -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/PSF_res -deps
+
+% figure(1)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/PSF_bmode -deps
+% figure(2)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/PSF_beampattern -deps
 
 %% point 1 & 5 cm horizontal point grid plots 
 
@@ -268,7 +283,7 @@ fig = 0;
 for i = 1:length(label)
     fig = fig+1;
     load(['point_gridh' label{i} '_MV128fft.mat'])
-    zlims = [min(z) 0.047].*1000;
+    zlims = [min(z) 0.0465].*1000;
     figure(fig)
 %     subplot(3,2,5)
     subplot(313)
@@ -276,6 +291,9 @@ for i = 1:length(label)
     ylim(zlims), grid off
     title('MV')
     ylabel('Depth [mm]')
+    ax = gca;
+    ax.FontSize = 16;
+    ax.YTick = [44:1:46];
 
     idx = find(z>=45/1000,1);
     tmp = env(idx,:);
@@ -292,6 +310,9 @@ for i = 1:length(label)
     ylim(zlims), grid off
     title('DS (Boxcar)')
     ylabel('Depth [mm]')
+    ax = gca;
+    ax.FontSize = 16;
+    ax.YTick = [44:1:46];
 
     idx = find(z>=45/1000,1);
     tmp = env(idx,:);
@@ -307,7 +328,10 @@ for i = 1:length(label)
     ylim(zlims), grid off
     title('DS (Hanning)')
     ylabel('Depth [mm]')
-    set(gcf,'position',[100 100 500 400])
+    set(gcf,'position',[100 100 500 500])
+    ax = gca;
+    ax.FontSize = 16;
+    ax.YTick = [44:1:46];
 
     idx = find(z>=45/1000,1);
     tmp = env(idx,:);
@@ -320,21 +344,31 @@ for i = 1:length(label)
     xlabel('Lateral Distance [mm]'); ylabel('Power [dB]')
     hold off
     fig = fig+1;
+    set(gcf,'position',[100 100 500 400])
+    ax = gca;
+    ax.FontSize = 16;
 end
 
 %%
+
+% figure(1)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_res_05 -deps
+% figure(2)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_res_1 -deps
+% figure(3)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_res_5 -deps
 figure(1)
-print ./fig/point_bmode_05 -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_bmode_05 -deps
 figure(2)
-print ./fig/point_bp_05 -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_bp_05 -deps
 figure(3)
-print ./fig/point_bmode_1 -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_bmode_1 -deps
 figure(4)
-print ./fig/point_bp_1 -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_bp_1 -deps
 figure(5)
-print ./fig/point_bmode_5 -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_bmode_5 -deps
 figure(6)
-print ./fig/point_bp_5 -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_bp_5 -deps
 %% vertical point grid plots with horizontal grid (separate grids)
  
 clear all; close all;
@@ -405,7 +439,7 @@ set(gcf,'position',[100 100 400 600])
 
 %%
 figure(1)
-print ./fig/point_grid -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/point_grid -deps
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% SSA WIRE TARGET FIGURES %%%%%%
@@ -421,55 +455,66 @@ figure(1)
 load SSA_points_MV128fft_Mp25.mat
 xmv = x;
 zmv = z;
-subplot(122)
+% subplot(122)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV'), grid off
+title('MV'), grid off
 % ylim([1000*min(zmv) 90])
 xlim(xlims)
 ax = gca;
 ax.YTick = [75:10:125];
+set(gcf,'position',[100 100 400 400])
+ax.FontSize = 20;
 
 load SSA_points.mat
 rf_cont = squeeze(sum(rf,2));
-subplot(121)
-rf2bmode(rf_cont,DR,x,z);
-xlim(1000.*[min(xmv) max(xmv)]);
-ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA'), grid off
-% ylim([1000*min(zmv) 90])
-xlim(xlims)
-set(gcf,'position',[100 100 800 300])
-ax = gca;
-ax.YTick = [75:10:125];
-
 figure(2)
-subplot(122)
 rf2bmode(rf_cont,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
+title('DS'), grid off
 % ylim([1000*min(zmv) 90])
 xlim(xlims)
-title('Swept Synthetic Aperture (SSA)'), grid off
+set(gcf,'position',[100 100 400 400])
 ax = gca;
 ax.YTick = [75:10:125];
+ax.FontSize = 20;
 
-load ./SSA_datasets/focusedSingle_points.mat
-subplot(121)
-rf2bmode(rf_focused,DR,x,z);
-xlim(1000.*[min(xmv) max(xmv)]);
-ylim(1000.*[min(zmv) max(zmv)]);
-% ylim([1000*min(zmv) 90])
-xlim(xlims)
-title('Single Position SA'), grid off
-set(gcf,'position',[100 100 800 300])
-ax = gca;
-ax.YTick = [75:10:125];
+% figure(2)
+% subplot(122)
+% rf2bmode(rf_cont,DR,x,z);
+% xlim(1000.*[min(xmv) max(xmv)]);
+% ylim(1000.*[min(zmv) max(zmv)]);
+% % ylim([1000*min(zmv) 90])
+% xlim(xlims)
+% title('Swept Synthetic Aperture (SSA)'), grid off
+% ax = gca;
+% ax.YTick = [75:10:125];
+
+% load ./SSA_datasets/focusedSingle_points.mat
+% subplot(131)
+% rf2bmode(rf_focused,DR,x,z);
+% xlim(1000.*[min(xmv) max(xmv)]);
+% ylim(1000.*[min(zmv) max(zmv)]);
+% % ylim([1000*min(zmv) 90])
+% xlim(xlims)
+% title('Single Position SA'), grid off
+% set(gcf,'position',[100 100 800 300])
+% ax = gca;
+% ax.YTick = [75:10:125];
 
 %%
 figure(1)
-print ./fig/SSA_MVSSA_compare -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/MVSSA_wire -deps
 figure(2)
-print ./fig/SSA_SA_compare -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_wire -deps
+
+% figure(1)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_wire_compare -deps
+% 
+% figure(1)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_MVSSA_compare -deps
+% figure(2)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_SA_compare -deps
 
 %% SSA beam pattern comparisons
 clear all; close all
@@ -478,6 +523,7 @@ clear all; close all
 % latlims = [5 15];
 depth = 79.1;
 latlims = [30 50];
+factor = 100;
 
 figure
 hold on
@@ -487,26 +533,41 @@ env =rf2bmode(rf_cont, [], x, z, [], [], 0);
 zi = find(z*1000>=depth,1);
 xi = find(x*1000>=latlims(1) & x*1000<=latlims(2));
 tmp = env(zi,xi);
-plot(1000*x(xi),20.*log10(tmp./max(tmp(:))),'k:');
+tmpdb = 20.*log10(tmp/max(tmp));
+tmpdb = interp(double(tmpdb),factor);
+x = x(xi);
+x = interp(x,factor);
+plot(1000*x,tmpdb,'k:');
+
+% tmpdb = 20.*log10(tmp/max(tmp));
+% tmpdb = interp(tmpdb,factor);
+% x = interp(x,factor);
+% fwhm(1) = x(find(tmpdb>=-6,1))-x(find(tmpdb>=-6,1));
+% lobes = sort(findpeaks(tmpdb),'descend');
 
 load SSA_points_MV128fft_Mp25.mat
 env = rf2bmode(rf_out, [], x, z, [], [], 0);
 zi = find(z*1000>=depth,1);
 xi = find(x*1000>=latlims(1) & x*1000<=latlims(2));
 tmp = env(zi,xi);
-plot(1000*x(xi),20.*log10(tmp./max(tmp(:))),'k-');
+tmpdb = 20.*log10(tmp/max(tmp));
+tmpdb = interp(double(tmpdb),factor);
+x = x(xi);
+x = interp(x,factor);
+plot(1000*x,tmpdb,'k-');
 ax = gca;
 ax.XTick = [30:5:50];
 axis square
 hold off
 
-h = legend('SSA','SSA + MV');
+h = legend('DS','MV');
 set(h,'FontSize',12);
 xlabel('Lateral Distance [mm]'); ylabel('Power [dB]')
+axis tight
 
 %%
 figure(1)
-print ./fig/SSA_MVSSA_bp -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_MVSSA_bp -deps
 %% SSA 6 & 12 dB contour comparisons
 clear all; close all
 
@@ -530,7 +591,7 @@ contour(1e3.*xwin,1e3.*zwin,envdb,[-12 -12],'r');
 contour(1e3.*xwin,1e3.*zwin,envdb,[-20 -20],'g');
 set(gca,'YDir','reverse');
 hold off
-title('SSA')
+title('DS')
 
 load SSA_points_MV128fft_Mp25.mat
 subplot(122)
@@ -542,11 +603,11 @@ contour(1e3.*xwin,1e3.*zwin,envdb,[-12 -12],'r');
 contour(1e3.*xwin,1e3.*zwin,envdb,[-20 -20],'g');
 set(gca,'YDir','reverse');
 hold off
-title('SSA + MV')
+title('MV')
 set(gcf,'position',[100 100 700 300])
 %%
 figure(1)
-print ./fig/SSA_MVSSA_contour -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_MVSSA_contour -deps
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% SSA FETAL PHANTOM FIGURES %%%%%
@@ -563,7 +624,7 @@ xmv = x;
 zmv = z;
 subplot(122)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV'), grid off
+title('MV'), grid off
 
 load SSA_fetal.mat
 rf_control = squeeze(sum(rf,2));
@@ -571,7 +632,7 @@ subplot(121)
 rf2bmode(rf_control,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA'), grid off
+title('DS'), grid off
 set(gcf,'position',[100 100 700 300])
 
 figure(2)
@@ -633,10 +694,16 @@ clear all; close all; clc
 DR = 45;
 CFDR = 70;
 
-les_x = [12 16];
-les_z = [98 102];
+% les_x = [12 16];
+% les_z = [98 102];
+% 
+% bg_x = [18 22];
+% bg_z = les_z;
 
-bg_x = [18 22];
+les_x = [4.8 5.3];
+les_z = [111 113];
+
+bg_x = [-2 0];
 bg_z = les_z;
 
 % SSA + MV CNR
@@ -771,7 +838,7 @@ title('SSA'), grid off
 set(gcf,'position',[100 100 600 600])
 %%
 figure(1)
-print ./fig/Mp_compare_fetal -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/Mp_compare_fetal -deps
 %% Zoomed SSA MV side-by-side Mp comparison (phantom target)
 clear all; close all; 
 
@@ -820,30 +887,65 @@ DR = 45;
 CFDR = 70;
 
 figure(1)
+
+
 load SSA_fetal_MV128fft_Mp25.mat
 xmv = x;
 zmv = z;
-subplot(132)
+% subplot(223)
+figure(1)
 rf2bmode(rf_out,DR,xmv,zmv);
-title('SSA + MV'), grid off
+title('MV'), grid off
+set(gcf,'position',[100 100 400 400])
+ax = gca;
+ax.FontSize = 20;
+
+load ./SSA_datasets/focusedSingle_fetal.mat
+% subplot(221)
+figure(2)
+rf2bmode(rf_focused,DR,x,z);
+xlim(1000.*[min(xmv) max(xmv)]);
+ylim(1000.*[min(zmv) max(zmv)]);
+title('Single Position SA'), grid off
+set(gcf,'position',[100 100 400 400])
+ax = gca;
+ax.FontSize = 20;
+
 
 load SSA_fetal_MV128fft_Mp25_CF.mat
-subplot(133)
+% subplot(224)
+figure(3)
 rf2bmode(rf_cf,CFDR,xmv,zmv);
-title('SSA + MV + CF [-70 dB]'), grid off
+title('MV + CF [-70 dB]'), grid off
+set(gcf,'position',[100 100 400 400])
+ax = gca;
+ax.FontSize = 20;
 
 load SSA_fetal.mat
 rf_cont = squeeze(sum(rf,2));
-subplot(131)
+% subplot(222)
+figure(4)
 rf2bmode(rf_cont,DR,x,z);
 xlim(1000.*[min(xmv) max(xmv)]);
 ylim(1000.*[min(zmv) max(zmv)]);
-title('SSA'), grid off
+title('DS'), grid off
 
-set(gcf,'position',[100 100 800 350])
+set(gcf,'position',[100 100 400 400])
+ax = gca;
+ax.FontSize = 20;
+
 %%
 figure(1)
-print ./fig/CF_compare_fetal -deps
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_fetal_SSAMV -deps
+figure(2)
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_fetal_SA -deps
+figure(3)
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_fetal_SSAMVCF -deps
+figure(4)
+print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_fetal_SSA -deps
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/SSA_fetal_compare -deps
+% figure(1)
+% print ~/Google' Drive'/Duke' Course Material s2015'/ECE' 582 DSP'/minvar_report/Final_Report/Main/figures/eps/CF_compare_fetal -deps
 %% SSA MV side-by-side comparison with CF (phantom target)
 clear all; close all
 
@@ -876,5 +978,3 @@ load SSA_fetal_MV128fft_Mp25_CF.mat
 subplot(222)
 rf2bmode(rf_cf,CFDR,xmv,zmv);
 title('SSA + MV + CF (Mp = 25, -70 dB)')
-
-

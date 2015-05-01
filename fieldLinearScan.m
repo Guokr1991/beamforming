@@ -86,8 +86,6 @@ rx_pos = unique(tdr_info(24,:));
 for nn = 1:lines
     xpos_shift = xpos+x(nn);
     position = [xpos_shift zeros(length(zpos),1) zpos];
-%     fprintf('Generating A-line %d/%d at %.1f mm \n',nn,lines,...
-%         1000*xpos_shift);
     xdc_times_focus(rx,0,zeros(1,N_el));
     [tmp st(nn)] = calc_scat_multi(tx,rx,position,amplitude);
     rf_tmp{nn} = tmp;

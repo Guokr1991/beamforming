@@ -49,7 +49,7 @@ e = ones(Mp,1); % steering vector for pre-beamformed data (all ones for
 fprintf('# elements for subarray avg: %d \n',Mp)
 
 rf_bf = zeros(length(z),M,length(lines));
-% perform pre-steering DR if needed
+% perform pre-steering dynamic receive
 switch flag
     case 0 
         idx = 0;
@@ -90,7 +90,6 @@ for l = lines
             end
             Rl = 1/Mp*Rl;
             Gav = 1/Mp*Gav;
-%             wl = inv(Rl)*e/(e'*inv(Rl)*e);
             wl = (Rl\e)/(e'*(Rl\e));
             Bl(k) = wl'*Gav;                % beamform operation in k-domain
         end
@@ -102,7 +101,4 @@ for l = lines
 end
 
 z = z(nz0);
-% [b,a]=butter(2,[.05 .95]);
-% rf_out = filter(b,a,rf_out);
-
 

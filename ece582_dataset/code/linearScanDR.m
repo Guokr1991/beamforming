@@ -1,7 +1,7 @@
 function [rf_out, rf_steer, x, z] = linearScanDR(rf_in,acq_params,bf_params,type)
 % [rf_out, ~, x, z] = linearScanDR(rf,acq_params,bf_params)
 %
-% Linear Scan DS beamforming code - Will Long. Latest revision: 4/2/15
+% Linear Scan DS beamforming code - Will Long. Latest revision: 4/15/15
 % Inputs: 
 % rf_in - element array data [array signal x array element x Tx event]
 % acq_params - parameters include rx_pos, c, t0

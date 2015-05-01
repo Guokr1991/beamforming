@@ -1,5 +1,5 @@
 function [CNR CR] = calcContrast(env_les, env_bg)
-% Contrast calculations - Will Long. Latest revision: 4/20/15
+% Contrast calculations - Will Long. Latest revision: 4/2/15
 % calculate contrast ratio and contrast to noise ratio given envelope
 % detected echo signals from inside target and outside target
 

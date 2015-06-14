@@ -23,7 +23,7 @@ figure
 plot(win)
 title('Apodization weights');
 
-rf_apo = zeros(rf);
+rf_apo = zeros(size(rf));
 for l = 1:size(rf,3); 
     rf_apo(:,:,l) = squeeze(rf(:,:,l)).*winmat; 
 end

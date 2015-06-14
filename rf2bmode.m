@@ -1,5 +1,5 @@
 function [env, rf_win, x_win, z_win] = rf2bmode(rf_out, dbrange, x, z, xlims, zlims, flag);
-%[env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, x, z)
+%[env_win, rf_win, x_win, z_win] = rf2bmode(rf_out, 40, x, z)
 %
 % rf_out - beamformer output of focused radiofrequency signal array
 % dbrange - dynamic range of output image in dB

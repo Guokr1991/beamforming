@@ -21,7 +21,7 @@ z = z_ref/2;
 [b,a]=butter(2,[.05 .95]);
 
 % intialize matrices and arrays for speed
-n_tx = length(bf_params.x);
+n_tx = size(rf_in,3);
 n_rcv_chn = length(acq_params.rx_pos);
 n_depth = length(z);
 rf_out = zeros(length(z),n_tx);

@@ -1,5 +1,8 @@
 function [rf, rf_raw, bf_params, acq_params] = fieldLinearScan(pointx,pointz,sec)
-addpath('../field_ii')
+% [rf, rf_raw, bf_params, acq_params] = fieldLinearScan(0,45,16);
+
+
+addpath '~/Documents/MATLAB/field_ii/'
 field_init(-1)
 rng(0);
 
@@ -93,10 +96,12 @@ end
 
 [rf, t0] = shift_times_multi(rf_tmp,st,fs);
 t0 = t0-tshift;
-SNR = 60;
 
+% add noise to rf
+SNR = 60;
 rf_raw = rf;
 rf = rf+10^(-SNR/20)*max(rf(:))*randn(size(rf));
+
 xdc_free(rx); xdc_free(tx);
 
 field_end

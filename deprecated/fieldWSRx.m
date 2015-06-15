@@ -5,6 +5,7 @@ if nargin < 3
     pointx = [];
     pointz = [];
     sec = 14;
+    
 end
 
 addpath('../field_ii')

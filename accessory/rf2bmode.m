@@ -39,6 +39,7 @@ x_idx = find(x >= xlims(1) & x <= xlims(2));
 
 z_win = z(z_idx);
 x_win = x(x_idx);
+rf_out(find(isnan(rf_out))) = 0;
 
 rf_win = rf_out(z_idx, x_idx);
 env=abs(hilbert(rf_win));

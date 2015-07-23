@@ -10,13 +10,18 @@ if size(y,2) == 1
     y = repmat(y,[1 size(xi,2)]);
 end
     
-dx = diff([x(1) x(2)]);
+tmp = unique(diff(x));
+dx = tmp(1);
 
 xi(xi>=max(x)) = NaN;
-yi = zeros(size(xi,1),size(xi,2));
-for j = 1:size(xi,2)
-    m = [diff(y(:,j))./dx; NaN];
-    nn_i = floor((xi(:,j)-x(1))./dx)+1;
-    nn_i(isnan(nn_i)) = 1;
-    yi(:,j) = m(nn_i).*(xi(:,j)-x(nn_i))+y(nn_i,j);
+yi = zeros(size(xi));
+
+if size(x,1) == 1
+    x = x';
+end
+
+for jj = 1:size(xi,2)
+    m = [diff(y(:,jj))./dx; 0];
+    nn_i = floor((xi(:,jj)-x(1))./dx);
+    yi(:,jj) = m(nn_i).*(xi(:,jj)-x(nn_i))+y(nn_i,jj);
 end

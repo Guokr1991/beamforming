@@ -35,12 +35,13 @@ zaxis = linspace(zrange(1),zrange(2),nzgrid);
 
 % IQdata = [t,n_el,angles]
 h = zeros(size(z_img,1),num_tx,size(x_img,2));
+dz_offset = 0;
 
 for k = 1:num_tx
     RFdata = squeeze(rf(:,:,k));
     angle = acq_params.angle(k);
-    dz = abs(z_img-repmat(z_origin,size(z_img)));
-    rtx = dz.*cosd(angle);
+%     dz = abs(z_img-repmat(z_origin,size(z_img)));
+%     rtx = dz.*cosd(angle);
     
     for x_id = 1:size(x_img,2)
         for z_id = 1:size(z_img,1)

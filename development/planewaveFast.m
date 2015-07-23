@@ -3,36 +3,37 @@ close all
 clc
 addpath ../accessory/
 % load ~/Google' Drive'/Trahey' Lab'/DTU_summer_school/flow_sa_project/point_target.mat
-load ../../scratch/complete_pwAcq_wire75_20150722_132721_1
+load /getlab/wjl11/scratch/verasonics_data/canine_pw_072315/complete_pwAcq_0deg_1n_100depth_20150723_114744_1.mat
 
 %%
 tic
 angle = rfdata.steerAngles;
 fs = rfdata.samplingRateMHz*1e6;
 c = rfdata.c;
-t0 = round(rfdata.timeZero); 
+t0 = rfdata.timeZero; 
 elspacing = rfdata.elementSpacingMM*1e-3;
 rf = rfdata.data;
 
 rref = (t0:t0+size(rf,1)-1).*c/(2*fs);
 
-xrange = [-0.01 0.01];
-zrange = [0.04 0.06];
+xrange = [-0.015 0.015];
+zrange = [0 0.11];
 
-nxgrid = 200;
-nzgrid = 300;
+nxgrid = 500;
+nzgrid = 1000;
 
 xpts = linspace(xrange(1),xrange(2),nxgrid);
 zpts = linspace(zrange(1),zrange(2),nzgrid);
 
 xel = (-(size(rf,2)-1)/2:(size(rf,2)-1)/2)*elspacing;
 nel = length(xel);
-nTxRcv = size(rf,3);
-nTxRcv = 5;
+txRcv = 600:605;
+nTxRcv = length(txRcv);
 
 rf_out = zeros(nzgrid,nxgrid,nTxRcv);
-
-for k = 1:nTxRcv
+idx = 0;
+for k = txRcv
+    idx = idx+1;
     r_offset = xel(end)*abs(sind(angle(k)));
     data = squeeze(rf(:,:,k));
 
@@ -61,7 +62,7 @@ for k = 1:nTxRcv
     tmp = reshape(interpdat,nzgrid,nxgrid,nel);
 %     imagesc(squeeze(tmp(:,140,:)));
 %     pause
-    rf_out(:,:,k) = sum(tmp,3);
+    rf_out(:,:,idx) = sum(tmp,3);
 end
 rf_out(find(isnan(rf_out))) = 0;
 toc

@@ -2,9 +2,9 @@ clear all
 close all
 clc
 addpath ../accessory/
-% load ~/Google' Drive'/Trahey' Lab'/DTU_summer_school/flow_sa_project/point_target.mat
-load /getlab/wjl11/scratch/verasonics_data/canine_pw_072315/complete_pwAcq_0deg_1n_100depth_20150723_114744_1.mat
+% load /getlab/wjl11/scratch/verasonics_data/canine_pw_072315/complete_pwAcq_0deg_1n_100depth_20150723_114744_1.mat
 
+load ~/Documents/MATLAB/data_files/beamforming/complete_pwAcq_5deg_5n_100depth_20150723_115306_0.mat
 %%
 tic
 angle = rfdata.steerAngles;
@@ -16,18 +16,18 @@ rf = rfdata.data;
 
 rref = (t0:t0+size(rf,1)-1).*c/(2*fs);
 
-xrange = [-0.015 0.015];
+xrange = [-0.01 0.01];
 zrange = [0 0.11];
 
 nxgrid = 500;
-nzgrid = 1000;
+nzgrid = 1200;
 
 xpts = linspace(xrange(1),xrange(2),nxgrid);
 zpts = linspace(zrange(1),zrange(2),nzgrid);
 
 xel = (-(size(rf,2)-1)/2:(size(rf,2)-1)/2)*elspacing;
 nel = length(xel);
-txRcv = 600:605;
+txRcv = [1 600 700];
 nTxRcv = length(txRcv);
 
 rf_out = zeros(nzgrid,nxgrid,nTxRcv);
